@@ -7,7 +7,6 @@ import 'package:excel/excel.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import '../providers/tds_provider.dart';
-import '../models/party.dart';
 import '../models/gst_tds_transaction.dart';
 import '../utils/extensions.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -30,9 +29,11 @@ class _TransactionEntryScreenState extends State<TransactionEntryScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     Future.microtask(() {
-      final provider = context.read<TDSProvider>();
-      provider.loadTransactions();
-      provider.loadParties();
+      if (mounted) {
+        final provider = context.read<TDSProvider>();
+        provider.loadTransactions();
+        provider.loadParties();
+      }
     });
   }
 
@@ -188,7 +189,7 @@ class _TransactionEntryScreenState extends State<TransactionEntryScreen>
           tabs: const [
             Tab(icon: Icon(Icons.list), text: 'Transactions'),
             Tab(icon: Icon(Icons.add), text: 'Manual Entry'),
-            Tab(icon: Icon(Icons.upload_file), text: 'Excel Import'),
+            Tab(icon: Icon(Icons.table_view), text: 'Excel Import'),
           ],
         ),
       ),

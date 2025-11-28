@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/tds_provider.dart';
-import '../models/company.dart';
 import '../widgets/sidebar.dart';
 import 'party_master_screen.dart';
 import 'transaction_entry_screen.dart';

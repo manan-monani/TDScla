@@ -21,7 +21,9 @@ class _PartyMasterScreenState extends State<PartyMasterScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<TDSProvider>().loadParties();
+      if (mounted) {
+        context.read<TDSProvider>().loadParties();
+      }
     });
   }
 
@@ -163,53 +165,25 @@ class _PartyMasterScreenState extends State<PartyMasterScreen> {
                   horizontalMargin: 12,
                   minWidth: 800,
                   columns: const [
-                    DataColumn2(label: Text('Code'), size: ColumnSize.S),
                     DataColumn2(label: Text('Party Name'), size: ColumnSize.L),
                     DataColumn2(label: Text('PAN'), size: ColumnSize.M),
                     DataColumn2(label: Text('GSTIN'), size: ColumnSize.M),
-                    DataColumn2(label: Text('Party Type'), size: ColumnSize.M),
                     DataColumn2(label: Text('Actions'), size: ColumnSize.S),
                   ],
                   rows: parties
                       .map(
                         (party) => DataRow(
                           cells: [
-                            DataCell(Text(party.code)),
                             DataCell(
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    party.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if (party.city != null)
-                                    Text(
-                                      party.city!,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                ],
+                              Text(
+                                party.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             DataCell(Text(party.pan)),
                             DataCell(Text(party.gstin ?? 'N/A')),
-                            DataCell(
-                              Chip(
-                                label: Text(
-                                  party.partyType.toString().split('.').last,
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                backgroundColor: _getPartyTypeColor(
-                                  party.partyType,
-                                ),
-                              ),
-                            ),
                             DataCell(
                               Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -244,17 +218,6 @@ class _PartyMasterScreenState extends State<PartyMasterScreen> {
       ),
     );
   }
-
-  Color _getPartyTypeColor(PartyType type) {
-    switch (type) {
-      case PartyType.company:
-        return Colors.blue.shade100;
-      case PartyType.nonCompany:
-        return Colors.green.shade100;
-      case PartyType.employee:
-        return Colors.orange.shade100;
-    }
-  }
 }
 
 class PartyFormDialog extends StatefulWidget {
@@ -280,209 +243,54 @@ class _PartyFormDialogState extends State<PartyFormDialog> {
           key: _formKey,
           initialValue: isEditing
               ? {
-                  'code': widget.party!.code,
                   'name': widget.party!.name,
                   'pan': widget.party!.pan,
                   'gstin': widget.party!.gstin,
-                  'address': widget.party!.address,
-                  'city': widget.party!.city,
-                  'state': widget.party!.state,
-                  'pin': widget.party!.pin,
-                  'mobile': widget.party!.mobile,
-                  'email': widget.party!.email,
-                  'stateCode': widget.party!.stateCode,
-                  'partyType': widget.party!.partyType,
-                  'compType': widget.party!.compType,
                 }
               : {},
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'code',
-                        decoration: const InputDecoration(
-                          labelText: 'Party Code *',
-                          hintText: 'Enter unique code',
-                        ),
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.minLength(2),
-                        ]),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: FormBuilderTextField(
-                        name: 'name',
-                        decoration: const InputDecoration(
-                          labelText: 'Party Name *',
-                          hintText: 'Enter party name',
-                        ),
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.minLength(3),
-                        ]),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'pan',
-                        decoration: const InputDecoration(
-                          labelText: 'PAN *',
-                          hintText: 'ABCDE1234F',
-                        ),
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.match(
-                            RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$'),
-                            errorText: 'Invalid PAN format',
-                          ),
-                        ]),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'gstin',
-                        decoration: const InputDecoration(
-                          labelText: 'GSTIN',
-                          hintText: '22ABCDE1234F1Z5',
-                        ),
-                        validator: FormBuilderValidators.match(
-                          RegExp(
-                            r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
-                          ),
-                          errorText: 'Invalid GSTIN format',
-                        ),
-                      ),
-                    ),
-                  ],
+                FormBuilderTextField(
+                  name: 'name',
+                  decoration: const InputDecoration(
+                    labelText: 'Party Name *',
+                    hintText: 'Enter party name',
+                  ),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(),
+                    FormBuilderValidators.minLength(3),
+                  ]),
                 ),
                 const SizedBox(height: 16),
                 FormBuilderTextField(
-                  name: 'address',
+                  name: 'pan',
                   decoration: const InputDecoration(
-                    labelText: 'Address',
-                    hintText: 'Enter complete address',
+                    labelText: 'PAN *',
+                    hintText: 'ABCDE1234F',
                   ),
-                  maxLines: 2,
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(),
+                    FormBuilderValidators.match(
+                      RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$'),
+                      errorText: 'Invalid PAN format',
+                    ),
+                  ]),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'city',
-                        decoration: const InputDecoration(
-                          labelText: 'City',
-                          hintText: 'Enter city',
-                        ),
-                      ),
+                FormBuilderTextField(
+                  name: 'gstin',
+                  decoration: const InputDecoration(
+                    labelText: 'GSTIN',
+                    hintText: '22ABCDE1234F1Z5',
+                  ),
+                  validator: FormBuilderValidators.match(
+                    RegExp(
+                      r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'state',
-                        decoration: const InputDecoration(
-                          labelText: 'State',
-                          hintText: 'Enter state',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'pin',
-                        decoration: const InputDecoration(
-                          labelText: 'PIN Code',
-                          hintText: '123456',
-                        ),
-                        validator: FormBuilderValidators.match(
-                          RegExp(r'^[1-9][0-9]{5}$'),
-                          errorText: 'Invalid PIN code',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'mobile',
-                        decoration: const InputDecoration(
-                          labelText: 'Mobile',
-                          hintText: '9876543210',
-                        ),
-                        validator: FormBuilderValidators.match(
-                          RegExp(r'^[6-9][0-9]{9}$'),
-                          errorText: 'Invalid mobile number',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: FormBuilderTextField(
-                        name: 'email',
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'email@domain.com',
-                        ),
-                        validator: FormBuilderValidators.email(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FormBuilderDropdown<PartyType>(
-                        name: 'partyType',
-                        decoration: const InputDecoration(
-                          labelText: 'Party Type *',
-                        ),
-                        validator: FormBuilderValidators.required(),
-                        items: PartyType.values
-                            .map(
-                              (type) => DropdownMenuItem(
-                                value: type,
-                                child: Text(type.toString().split('.').last),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: FormBuilderDropdown<CompType>(
-                        name: 'compType',
-                        decoration: const InputDecoration(
-                          labelText: 'Company Type *',
-                        ),
-                        validator: FormBuilderValidators.required(),
-                        items: CompType.values
-                            .map(
-                              (type) => DropdownMenuItem(
-                                value: type,
-                                child: Text(type.toString().split('.').last),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                  ],
+                    errorText: 'Invalid GSTIN format',
+                  ),
                 ),
               ],
             ),
@@ -505,19 +313,28 @@ class _PartyFormDialogState extends State<PartyFormDialog> {
 
                         final party = Party(
                           id: isEditing ? widget.party!.id : null,
-                          code: values['code'],
+                          code: values['name']
+                              .toString()
+                              .toUpperCase()
+                              .replaceAll(' ', '')
+                              .substring(
+                                0,
+                                (values['name'].toString().length > 5
+                                    ? 5
+                                    : values['name'].toString().length),
+                              ),
                           name: values['name'],
-                          pan: values['pan'].toUpperCase(),
-                          gstin: values['gstin']?.toUpperCase(),
-                          address: values['address'],
-                          city: values['city'],
-                          state: values['state'],
-                          pin: values['pin'],
-                          mobile: values['mobile'],
-                          email: values['email'],
-                          stateCode: values['stateCode'],
-                          partyType: values['partyType'],
-                          compType: values['compType'],
+                          pan: values['pan'].toString().toUpperCase(),
+                          gstin: values['gstin']?.toString().toUpperCase(),
+                          address: null,
+                          city: null,
+                          state: null,
+                          pin: null,
+                          mobile: null,
+                          email: null,
+                          stateCode: null,
+                          partyType: PartyType.company,
+                          compType: CompType.firm,
                           createdAt: isEditing
                               ? widget.party!.createdAt
                               : DateTime.now(),

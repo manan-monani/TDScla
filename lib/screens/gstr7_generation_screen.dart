@@ -404,7 +404,7 @@ class _GSTR7GenerationScreenState extends State<GSTR7GenerationScreen>
           tabs: const [
             Tab(icon: Icon(Icons.settings), text: 'Generate'),
             Tab(icon: Icon(Icons.table_chart), text: 'View Data'),
-            Tab(icon: Icon(Icons.download), text: 'Export'),
+            Tab(icon: Icon(Icons.file_download), text: 'Export'),
           ],
         ),
       ),

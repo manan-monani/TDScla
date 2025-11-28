@@ -22,7 +22,9 @@ class _CompanySelectionScreenState extends State<CompanySelectionScreen> {
     super.initState();
     // Load companies when screen initializes
     Future.microtask(() {
-      context.read<TDSProvider>().loadCompanies();
+      if (mounted) {
+        context.read<TDSProvider>().loadCompanies();
+      }
     });
   }
 
@@ -106,7 +108,7 @@ class _CompanySelectionScreenState extends State<CompanySelectionScreen> {
                             return DropdownMenuItem<Company>(
                               value: company,
                               child: Text(
-                                '${company.name} - F.Y. ${company.financialYear}',
+                                company.name,
                                 style: const TextStyle(fontSize: 14),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -134,9 +136,7 @@ class _CompanySelectionScreenState extends State<CompanySelectionScreen> {
                             labelText: 'Financial Year',
                             prefixIcon: Icon(Icons.calendar_today),
                           ),
-                          controller: TextEditingController(
-                            text: selectedFinancialYear ?? '',
-                          ),
+                          initialValue: selectedFinancialYear ?? '',
                           readOnly: true,
                           style: TextStyle(
                             color: selectedCompany != null
